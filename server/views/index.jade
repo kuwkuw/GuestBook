@@ -1,0 +1,36 @@
+extends layout
+
+block content
+  div.container
+    h1= title
+    p Welcome to #{title}
+    div(ng-controller="HomeController" novalidate)
+      div.row
+        div.comments-form.col-sm-4
+          form(name="form" ng-submit="submitForm()")
+            div.form-group
+              input(type="text" name="name" class="form-control" ng-model="userMsg.name" ng-required="true" ng-pattern="/^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$/")
+              div(ng-show="form.name.$invalid")
+                p(ng-show="form.name.$error.required && !form.name.$pristine" class="help-block") Name is required.
+                p(ng-show="form.name.$error.pattern && !form.name.$pristine" class="help-block") Name is digits and letters.
+            div.form-group
+              input(type="email" name="email" class="form-control" ng-model="userMsg.email" ng-required="true")
+              p(ng-show="form.email.$invalid && !form.email.$pristine" class="help-block") Email is required.
+            div.form-group
+              input(type="url" name="url" class="form-control" ng-model="userMsg.url")
+            div.form-group
+              textarea(name="msgText" class="form-control" ng-model="userMsg.msgText" ng-required="true")
+              p(ng-show="form.msgText.$invalid && !form.msgText.$pristine" class="help-block") Text is required.
+            button(type="submit" class="btn btn-primary" ng-disabled="form.$invalid") Submit
+        div.comments.col-sm-8
+          table.table.table-striped
+            thead
+              tr
+                th(ng-repeat="(key, columnName) in commentsHead" ng-click="changeSorting(key)") {{columnName}}
+                  span(ng-class="selectedCls(key)")
+            tr(ng-repeat="comment in comments | orderBy :sort.column :sort.descending | pagination :startIndex :endIndex")
+              td {{comment.name}}
+              td {{comment.email}}
+              td {{comment.date | date}}
+              td {{comment.msgText}}
+          uib-pagination(total-items="totalItems" max-size="5" ng-model="currentPage" ng-change="pageChanged()")
