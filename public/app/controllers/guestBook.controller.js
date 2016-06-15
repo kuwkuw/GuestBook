@@ -3,11 +3,11 @@
 
     angular
         .module('GuestBook')
-        .controller('HomeController', homeController);
+        .controller('GuestBookController', guestBookController);
 
     homeController.$inject = ['SocketService', '$scope'];
 
-    function homeController(socketService, $scope){
+    function guestBookController(socketService, $scope){
         $scope.comments = [];
         socketService.getMoqData().then(function(data){
             console.log(data);
@@ -29,18 +29,24 @@
         $scope.userMsg;
 
         /**
-         * Pagination configurationsnpm
+         * Pagination configurations
         **/
-
         $scope.currentPage = 1;
         $scope.startIndex = 0;
         $scope.endIndex = 5;
-        //$scope.maxSize = 5;
-        //$scope.numPages = 5;
+        $scope.maxSize = 5;
 
         $scope.setPage = function (pageNo) {
             $scope.currentPage = pageNo;
         };
+
+        $scope.pageChanged = function(){
+            console.log($scope.startIndex, $scope.endIndex);
+            $scope.startIndex = ($scope.currentPage-1)*5;
+            $scope.endIndex = $scope.startIndex + 5;
+            console.log($scope.startIndex, $scope.endIndex);
+        };
+
         /*
         * Sorting
         * */
@@ -62,13 +68,9 @@
             $scope.sort.column = columnName;
         };
 
-        $scope.pageChanged = function(){
-            console.log($scope.startIndex, $scope.endIndex);
-            $scope.startIndex = ($scope.currentPage-1)*5;
-            $scope.endIndex = $scope.startIndex + 5;
-            console.log($scope.startIndex, $scope.endIndex);
-        };
-
+        /*
+        * Socket handlers
+        * */
         socketService.onReceive(function(msg){
             $scope.$apply(function(){
                 $scope.comments.push(msg);
@@ -76,11 +78,10 @@
         });
 
         $scope.submitForm = function(){
-            socketService.send(convertToMsgTransferObj($scope.userMsg));
+            socketService.send(convertMsgToTransferObj($scope.userMsg));
         };
 
-
-        function convertToMsgTransferObj(userMsg){
+        function convertMsgToTransferObj(userMsg){
             return{
                 name: userMsg.name,
                 email: userMsg.email,

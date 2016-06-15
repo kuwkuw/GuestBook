@@ -4,10 +4,10 @@ block content
   div.container
     h1= title
     p Welcome to #{title}
-    div(ng-controller="HomeController" novalidate)
+    div(ng-controller="GuestBookController")
       div.row
         div.comments-form.col-sm-4
-          form(name="form" ng-submit="submitForm()")
+          form(name="form" ng-submit="submitForm()" novalidate)
             div.form-group
               input(type="text" name="name" class="form-control" ng-model="userMsg.name" ng-required="true" ng-pattern="/^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$/")
               div(ng-show="form.name.$invalid")
@@ -19,8 +19,10 @@ block content
             div.form-group
               input(type="url" name="url" class="form-control" ng-model="userMsg.url")
             div.form-group
-              textarea(name="msgText" class="form-control" ng-model="userMsg.msgText" ng-required="true")
-              p(ng-show="form.msgText.$invalid && !form.msgText.$pristine" class="help-block") Text is required.
+              textarea(name="msgText" class="form-control" ng-model="userMsg.msgText" ng-required="true" mg-pattern='/(?=>)?(\w[^>]+?)(?=<)/')
+              div(ng-show="form.msgText.$invalid")
+                p(ng-show="form.msgText.$error.required && !form.msgText.$pristine" class="help-block") Text is required.
+                p(ng-show="form.msgText.$error.pattern && !form.msgText.$pristine" class="help-block") Text is only text.
             button(type="submit" class="btn btn-primary" ng-disabled="form.$invalid") Submit
         div.comments.col-sm-8
           table.table.table-striped
@@ -33,4 +35,4 @@ block content
               td {{comment.email}}
               td {{comment.date | date}}
               td {{comment.msgText}}
-          uib-pagination(total-items="totalItems" max-size="5" ng-model="currentPage" ng-change="pageChanged()")
+          uib-pagination(total-items="totalItems" max-size="maxSize" ng-model="currentPage" ng-change="pageChanged()")
