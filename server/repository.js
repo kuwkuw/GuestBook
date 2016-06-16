@@ -4,7 +4,7 @@ var pool = db.createPool({
     connectionLimit : 100, //important
     host     : 'localhost',
     user     : 'root',
-    password : 'Gim03033',
+    password : '',
     database : 'guest_book',
     debug    :  false
 });
