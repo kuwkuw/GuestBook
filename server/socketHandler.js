@@ -1,13 +1,17 @@
 var io = require('socket.io');
+var repository = require('./repository');
 
 function ioHandler(http){
     this.webSocket = io(http);
 
     this.webSocket.on('connection', function(socket){
-
-        socket.emit('connection-msg', getMoqData());
+        repository.getAllComments(function(data){
+            socket.emit('connection-msg', data);
+        });
+        //socket.emit('connection-msg', getMoqData());
         socket.on('new-msg', function(msg){
             console.log('message: ' + JSON.stringify(msg));
+            repository.insertComment(msg);
             socket.emit('new-msg', msg);
         });
     });

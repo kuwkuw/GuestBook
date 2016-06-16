@@ -1,0 +1,12 @@
+extends layout
+block content
+   div.container
+      h1= title
+      p Welcome to #{title}
+      div(ng-controller="GuestBookControllerAjax")
+         div.row
+            div.comments-form.col-sm-4
+               include ./form.jade
+            div.comments.col-sm-8
+               include ./table.jade
+

@@ -3,22 +3,20 @@
 
     angular
         .module('GuestBook')
-        .controller('GuestBookController', guestBookController);
+        .controller('GuestBookControllerAjax', guestBookControllerAjax);
 
-    guestBookController.$inject = ['SocketService', '$scope'];
+    guestBookControllerAjax.$inject = ['$scope', 'HttpService'];
 
-    function guestBookController(socketService, $scope){
+    function guestBookControllerAjax($scope, httpService){
         $scope.comments = [];
-        socketService.getData().then(function(data){
-            console.log(data);
-            $scope.comments = data;
+        httpService.getAllComments().then(function(data){
+            $scope.comments = data.data;
             $scope.totalItems = $scope.comments.length*10/5;
         });
 
-
         /*
-        * Table header
-        * */
+         * Table header
+         * */
         $scope.commentsHead = {
             name: 'Name',
             email: 'Email',
@@ -26,11 +24,9 @@
             msgText: 'Text'
         };
 
-        $scope.userMsg;
-
         /**
          * Pagination configurations
-        **/
+         **/
         $scope.currentPage = 1;
         $scope.startIndex = 0;
         $scope.endIndex = 5;
@@ -41,15 +37,13 @@
         };
 
         $scope.pageChanged = function(){
-            console.log($scope.startIndex, $scope.endIndex);
             $scope.startIndex = ($scope.currentPage-1)*5;
             $scope.endIndex = $scope.startIndex + 5;
-            console.log($scope.startIndex, $scope.endIndex);
         };
 
         /*
-        * Sorting
-        * */
+         * Sorting
+         * */
         $scope.sort = {};
         $scope.sort.column = 'name';
         $scope.sort.descending = true;
@@ -69,16 +63,14 @@
         };
 
         /*
-        * Socket handlers
-        * */
-        socketService.onReceive(function(msg){
-            $scope.$apply(function(){
-                $scope.comments.push(msg);
-            });
-        });
-
+         * Add new comment
+         **/
         $scope.submitForm = function(){
-            socketService.send(convertMsgToTransferObj($scope.userMsg));
+            httpService.addComment(convertMsgToTransferObj($scope.userMsg)).then(function(data){
+                //$scope.$apply(function(){
+                //    $scope.comments.push(data.data);
+                //});
+            });
         };
 
         function convertMsgToTransferObj(userMsg){
@@ -91,3 +83,4 @@
         }
     }
 })();
+

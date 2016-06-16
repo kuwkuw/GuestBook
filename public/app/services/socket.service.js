@@ -5,10 +5,12 @@
         .module('GuestBook')
         .factory('SocketService', SocketService);
 
+    SocketService.$inject = ['$q'];
+
     function SocketService($q){
         var deferred = $q.defer();
         var socket = io.connect();
-        var dataMoq = [];
+
         socket.on('connection-msg', function(data){
             console.log(data);
             deferred.resolve(data);
@@ -20,7 +22,7 @@
             onReceive: function(collback){
                 socket.on('new-msg', collback);
             },
-            getMoqData: function(){
+            getData: function(){
                 return deferred.promise;
             }
         };
